@@ -1,0 +1,112 @@
+﻿
+
+//Communication example 
+
+// If i get question about sth: I need program name, program Version and if is on robot 
+
+
+            FilePropertiesRequest request26 = new FilePropertiesRequest(@"ProgramName");
+            FilePropertiesResponse response26 = (FilePropertiesResponse) syncClient.SendRequest(request26);
+            Console.WriteLine("Command: {0}, Success: {1}, ErrorCode: {2}", response26.Type, response26.Success, response26.ErrorCode);
+
+            string data = DateTime.Now.ToString("yyyy-MM-dd");
+            string file = @"C:\Users\marlena.knitter\Desktop\ProgramName + data + ".json";
+
+            if (response26.Success)
+            {
+                Console.WriteLine("    Name: {0}", response26.FileName);
+                Console.WriteLine("    Size: {0}", response26.FileSize);
+                Console.WriteLine("    Type: {0}", response26.FileType);
+                Console.WriteLine("    Attributes: {0}", response26.Attributes);
+                Console.WriteLine("    Edit Mode: {0}", response26.EditMode);
+                Console.WriteLine("    Creation Time: {0}", response26.CreationTime);
+                Console.WriteLine("    Last Access Time: {0}", response26.LastAccessTime);
+                Console.WriteLine("    Last Write Time: {0}", response26.LastWriteTime);
+
+                    string[] inforob = { "{",
+            "\"id\":" +"\""+ response26.FileName+ "\"" + ",",
+            "\"type\": \"Product\",",
+            "\"programName\":", 
+            "   {",
+            "   \"value \":" +"\""+ response26.FileName+"\"" + ",",
+            "   \"type\": \"String\"",
+            "   },",
+             "\"programVersion\":",
+            "   {",
+            "   \"value \":" + ProgVers  + ",",
+            "   \"type\": \"Integer\"",
+            "   },",
+              "\"programOnRobot\":",
+            "   {",
+            "   \"value \":" + true + "," ,
+            "   \"type\": \"Boolean\"",
+            "   }", "}" , " "
+        };
+
+
+        // auch zum DB program Version !
+
+        File.AppendAllLines(file, inforob);
+   
+            }
+
+            if (response26.ErrorCode)
+            {
+
+                 string[] inforob = {
+                 "\"programOnRobot\":",
+            "   {",
+            "   \"value \":" + false + "," ,
+            "   \"type\": \"Boolean\"",
+            "   }", "}" , " "
+            }
+
+            }
+
+
+// Fiware should check if program is there, if not i should get from server
+
+
+            if (syncClient.SendRequest(new CreateFileRequest(@"servpath")).Success)
+
+            {
+                       // Copy
+                response = syncClient.SendRequest(new CopyFileRequest(@"ServerPATH", @"KRC:\R1\PROGRAM\Robotpath"));
+                Console.WriteLine("Command: {0}, Success: {1}, ErrorCode: {2}", response.Type, response.Success, response.ErrorCode);
+
+            }
+
+// If the program change soo programVersion +1 i need to send this program to server
+
+
+If ProgVers!=JakisVariablZrobic 
+
+
+
+
+            if (syncClient.SendRequest(new CreateFileRequest(@"KRC:\R1\PROGRAM\C3_TEST")).Success)
+
+            {
+                       // Copy src + dat -  sprawdzic jak to dziala, najprawdopodobniej dodac drugi dla dat 
+                response = syncClient.SendRequest(new CopyFileRequest(@"KRC:\R1\PROGRAM\Robotpath", @"ServerPATH+data"));
+                Console.WriteLine("Command: {0}, Success: {1}, ErrorCode: {2}", response.Type, response.Success, response.ErrorCode);
+
+            }
+
+
+
+// db for flask
+
+// i need class model with: 
+// id = db.Column(db.String(24), primary_key=True)
+// version = db.Column(db.Integer)
+// robot = db.Column(db.bool)
+
+
+
+// cratedb dla c# - komunikacja i sprawdzanie 
+// ten sam db dla wszystkiego??
+//server na flasku - polaczyc to z tym co potrzebujemy z plc, co wysylamy i dostajemy
+//postman, gdzie moge napisac sobie api do dodawania  inforoba bezposrednio na server 
+
+// jak ogarnac to wysylanie programow?? - czy na razie mozemy to ogarnac recznie czy juz musi dzialac 
