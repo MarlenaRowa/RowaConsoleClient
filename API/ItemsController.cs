@@ -20,7 +20,9 @@ namespace Catalog.Controllers
  {
 
     private readonly IItemsRepository repository;
-    public ItemsController(IItemsRepository repository)
+        private Item item;
+
+        public ItemsController(IItemsRepository repository)
     {
         this.repository = repository;
 
@@ -61,15 +63,16 @@ namespace Catalog.Controllers
 
             //wir bekommen data für spatere program schicken 
             string data = DateTime.Now.ToString("yyyy-MM-dd");
-                       
+
             // hier wir bekommen program name 
-            ProgramCheck.Name = item.Name;
+            this.item = new Item(); 
+            this.item.Name = item.Name;
 
             // prüfen ob program exiestiert  // here is a check, if program exsist
             FilePropertiesRequest request26 = new FilePropertiesRequest(@"KRC:\R1\Program\ROWA\" + ProgramCheck.Name);
             FilePropertiesResponse response26 = (FilePropertiesResponse)syncClient.SendRequest(request26);
             //  das console hier - wie alle andere ist hier nur für testen, weil hier wir sehen status // console will be later thown away, now is only for test, if data goes
-            Console.WriteLine("Command: {0}, Success: {1}, ErrorCode: {2}", response26.Type, response26.Success, response26.ErrorCode);
+           Console.WriteLine("Command: {0}, Success: {1}, ErrorCode: {2}", response26.Type, response26.Success, response26.ErrorCode);
 
             // in falls program steht am roboter :
             if (response26.Success)
@@ -92,7 +95,7 @@ namespace Catalog.Controllers
                         SetFileAttributesRequest request20 = new SetFileAttributesRequest(@"KRC:/R1/PROGRAM/" + ProgramCheck.Name, ItemAttribute.ReadOnly, ItemAttribute.ReadOnly); // hier wir mussen prüfen ob wir bekommen dat + src oder nur eine, ich wollte das gestern Testen (30.05)
                         Response response = syncClient.SendRequest(request20);
                         // Move
-                        response = syncClient.SendRequest(new CopyFileRequest(@"KRC:\R1\PROGRAM\" + ProgramCheck.Name, @"PLATZ_ON_SERVER_FUER_DAS_FILE\" + ProgramCheck.Name + data, true));
+                        response = syncClient.SendRequest(new CopyFileRequest(@"KRC:\R1\PROGRAM\" + ProgramCheck.Name, @"PLATZ_ON_SERVER_FUER_DAS_FILE\" + ProgramCheck.Name + data + "V_" + ProgramCheck.VersionOnRobot, true));
                         Console.WriteLine("Command: {0}, Success: {1}, ErrorCode: {2}", response.Type, response.Success, response.ErrorCode);
 
 
@@ -150,19 +153,21 @@ namespace Catalog.Controllers
     [HttpPut("{entityId}")]
     public ActionResult UpdateItem(Guid id, UpdateItemDto itemDto)
     {
-        var existingItem = repository.GetItem(id);
+        Item existingItem = repository.GetItem(id);
 
         if (existingItem is null)
         {
             return NotFound();
         }
-        // here i shoud post data from up, but this variables are not working -,-
-        Item updatedItem = existingItem with
-        {
-            Name = itemDto.Name,
-            versionOnRobot = itemDto.versionOnRobot
+            // here i shoud post data from up, but this variables are not working -,-
 
-        };
+            Item updatedItem = (Item)existingItem.Clone();
+
+
+            updatedItem.Name = item.Name;
+            updatedItem.versionOnRobot = itemDto.versionOnRobot;
+
+        
 
         repository.UpdateItem(updatedItem); 
 
