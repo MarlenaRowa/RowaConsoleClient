@@ -10,7 +10,7 @@ namespace Variable
     {
  
             public string Name = "blasius1";
-        public int VersionOnRobot { get; set; } = 1;
-        
+
+        public int VersionOnRobot { get; set; }        
     }
 }
