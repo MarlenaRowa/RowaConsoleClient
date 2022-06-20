@@ -36,6 +36,7 @@ namespace ProgramNummerCheck
             // Add dictionary 1 string - pr name, 2 string last modification datum 
 
             Dictionary<string, string> ProgramDict = new Dictionary<string, string>();
+            Dictionary<string, int> ValueDict = new Dictionary<string, int>();
 
             // using variables 
             Variable.Variables ProgramCheck = new Variable.Variables();
@@ -71,15 +72,18 @@ namespace ProgramNummerCheck
 
                 // check and compare date from file with data gotten from Robot
 
-                if (ProgramDict.ContainsValue(response26.FileName) == true)
+                if (ProgramDict.ContainsValue(ProgramCheck.Name) == true)
                 {
 
-                    ProgramDict.TryGetValue(response26.FileName, out VersDatOnRobot);
+                    ProgramDict.TryGetValue(ProgramCheck.Name, out VersDatOnRobot);
+                    ValueDict.Add(ProgramCheck.Name, ProgramCheck.VersionOnRobot);
                 }
                 else
                 {
-                    ProgramDict.Add(response26.FileName, VersDat);
                     VersDatOnRobot = VersDat;
+                    ProgramDict.Add(ProgramCheck.Name, VersDat);
+                    ProgramCheck.VersionOnRobot = 1; 
+                    ValueDict.Add(ProgramCheck.Name, ProgramCheck.VersionOnRobot);
                 }
 
 
@@ -89,8 +93,8 @@ namespace ProgramNummerCheck
 
                     VersDatOnRobot = VersDat;
 
-                    ProgramDict[response26.FileName] = VersDatOnRobot;
-
+                    ProgramDict[ProgramCheck.Name] = VersDatOnRobot;
+                    ValueDict[ProgramCheck.Name] = ProgramCheck.VersionOnRobot; 
                 }
                 // hier should be variable we are using for sending it away to fiware 
 
