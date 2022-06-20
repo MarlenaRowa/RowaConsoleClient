@@ -80,9 +80,9 @@ namespace ProgramNummerCheck
 
             Dictionary<string, string> ProgramDict = new Dictionary<string, string>();
             Dictionary<string, int> ValueDict = new Dictionary<string, int>();
-
+            
             Variable.Variables ProgramCheck = new Variable.Variables();
-
+            ProgramDict.Add(ProgramCheck.Name, Convert.ToString(dictLesen.DataOnRobot));
             // hier should be :
             // ProgramCheck.Name = Name Variable from API 
 
@@ -110,11 +110,13 @@ namespace ProgramNummerCheck
                 string VersDat = Convert.ToString(response26.LastWriteTime);
 
                 string VersDatOnRobot = Convert.ToString(dictLesen.DataOnRobot);
-
+                Console.WriteLine(VersDatOnRobot);
+                    Console.WriteLine(VersDat);
                 // check and compare date from file with data gotten from Robot
 
                 if (ProgramDict.ContainsKey(ProgramCheck.Name) == true)
                 {
+
 
 
                     ProgramDict.TryGetValue(ProgramCheck.Name, out VersDatOnRobot);
@@ -124,11 +126,12 @@ namespace ProgramNummerCheck
 
                 else
                 {
-
+                    Console.WriteLine("");
                     ProgramDict.Add(ProgramCheck.Name, VersDat);
                     ProgramCheck.VersionOnRobot = 1;
                     ValueDict.Add(ProgramCheck.Name, ProgramCheck.VersionOnRobot);
                     VersDatOnRobot = VersDat;
+                    
                 }
 
 
@@ -136,10 +139,16 @@ namespace ProgramNummerCheck
                 if (VersDat != VersDatOnRobot)
                 {
                     Console.WriteLine("versdat != versonrobot");
-
+                    ProgramCheck.VersionOnRobot = valueLesen.ValueOnRobot;
+                    ProgramCheck.VersionOnRobot++;
                     VersDatOnRobot = VersDat;
 
                     ProgramDict[ProgramCheck.Name] = VersDatOnRobot;
+                    ValueDict[ProgramCheck.Name] = ProgramCheck.VersionOnRobot;
+                }
+                else
+                {
+                    ProgramCheck.VersionOnRobot = valueLesen.ValueOnRobot;
                     ValueDict[ProgramCheck.Name] = ProgramCheck.VersionOnRobot;
                 }
                 // hier should be variable we are using for sending it away to fiware 
