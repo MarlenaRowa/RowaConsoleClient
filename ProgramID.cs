@@ -9,35 +9,35 @@ namespace ProgramNummerCheck
 
     public class DataLesen
     {
-
-
+        public object DataOnRobot { get;  set; }
 
         public void ReadConfig(string txtFile1)
         {
-            Variable.Variables ProgramCheck = new Variable.Variables();
+            Variable.Variables DataLesen = new Variable.Variables();
             var dict = File.ReadAllLines(txtFile1)
                            .Select(l => l.Split(new[] { ';' }))
                            .ToDictionary(s => s[0].Trim(), s => s[1].Trim());  // read the entire file into a dictionary.
 
+            DataOnRobot = Convert.ToString(dict[DataLesen.Name]);
             //ForTesting
-            //  Console.WriteLine(dict[ProgramCheck.Name]);
+            Console.WriteLine(dict[DataLesen.Name]);
         }
 
     }
     public class ValueLesen
     {
-
-
+        public int ValueOnRobot { get; set; }
 
         public void ReadConfig(string txtFile1)
         {
-            Variable.Variables ProgramCheck = new Variable.Variables();
+            Variable.Variables ValueLesen = new Variable.Variables();
             var dict = File.ReadAllLines(txtFile1)
                            .Select(l => l.Split(new[] { ';' }))
                            .ToDictionary(s => s[0].Trim(), s => s[1].Trim());  // read the entire file into a dictionary.
 
+            ValueOnRobot = Convert.ToInt32(dict[ValueLesen.Name]);
             //ForTesting
-            //Console.WriteLine(dict[ProgramCheck.Name]);
+            Console.WriteLine("value:" + ValueOnRobot);
         }
     }
     #endregion
@@ -51,9 +51,13 @@ namespace ProgramNummerCheck
 
             DataLesen dictLesen = new DataLesen();
             dictLesen.ReadConfig(@"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\ProgramDict.txt");
-            ValueLesen dictLesen2 = new ValueLesen();
-            dictLesen.ReadConfig(@"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\ValueDict.txt");
+            ValueLesen valueLesen = new ValueLesen();
+            valueLesen.ReadConfig(@"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\ValueDict.txt");
+            // using variables 
 
+           
+
+            Console.WriteLine(valueLesen.ValueOnRobot);
 
             // connection to robot
 
@@ -77,8 +81,8 @@ namespace ProgramNummerCheck
             Dictionary<string, string> ProgramDict = new Dictionary<string, string>();
             Dictionary<string, int> ValueDict = new Dictionary<string, int>();
 
-            // using variables 
             Variable.Variables ProgramCheck = new Variable.Variables();
+
             // hier should be :
             // ProgramCheck.Name = Name Variable from API 
 
@@ -105,7 +109,7 @@ namespace ProgramNummerCheck
                 // VersDat is a string variable make from data we get from robot
                 string VersDat = Convert.ToString(response26.LastWriteTime);
 
-                string? VersDatOnRobot;
+                string VersDatOnRobot = Convert.ToString(dictLesen.DataOnRobot);
 
                 // check and compare date from file with data gotten from Robot
 

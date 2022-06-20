@@ -11,6 +11,7 @@ namespace Variable
  
             public string Name = "blasius1";
 
-        public int VersionOnRobot { get; set; }        
+        public int VersionOnRobot { get; set; }      
+        public string ModificationData { get; set; }
     }
 }
