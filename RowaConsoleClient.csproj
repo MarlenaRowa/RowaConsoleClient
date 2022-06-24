@@ -12,6 +12,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+    <PackageReference Include="Nancy" Version="2.0.0" />
     <PackageReference Include="RestClient" Version="3.860.28084" />
     <PackageReference Include="RestSharp" Version="108.0.1" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
