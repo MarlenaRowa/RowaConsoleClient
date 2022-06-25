@@ -271,7 +271,74 @@ namespace ProgramNummerCheck
             }
 
         }
+        public static void Subscription2()
 
+        {
+            var client = new RestClient("http://localhost:5011/");
+            var request = new RestRequest("/Subscription2");
+            var response = client.Execute(request);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                string Sub1 = System.IO.File.ReadAllText(@"C:\Users\marlena.knitter\Desktop\RoboBox\RowaKukaKlientAlpha\RowaConsoleClient\Sub2.txt");
+
+                string rawResponse = response.Content;
+
+                if (Sub1 != rawResponse)
+                {
+                    Console.WriteLine(rawResponse);
+                    DataSub1 datumDto = new JavaScriptSerializer().Deserialize<DataSub1>(rawResponse); ;
+                    foreach (var item in datumDto.data)
+                    {
+                        Console.WriteLine("Co wyszlo:" + item.productID.value);
+                        ProgramName = item.productID.value;
+
+
+                    }
+                    File.WriteAllTextAsync("Sub3.txt", rawResponse);
+                }
+                SubNr = 2;
+            }
+            else
+            {
+                Console.Write("Sh*t happend");
+            }
+
+        }
+        public static void Subscription3()
+
+        {
+            var client = new RestClient("http://localhost:5011/");
+            var request = new RestRequest("/Subscription3");
+            var response = client.Execute(request);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                string Sub1 = System.IO.File.ReadAllText(@"C:\Users\marlena.knitter\Desktop\RoboBox\RowaKukaKlientAlpha\RowaConsoleClient\Sub3.txt");
+
+                string rawResponse = response.Content;
+
+                if (Sub1 != rawResponse)
+                {
+                    Console.WriteLine(rawResponse);
+                    DataSub1 datumDto = new JavaScriptSerializer().Deserialize<DataSub1>(rawResponse); ;
+                    foreach (var item in datumDto.data)
+                    {
+                        Console.WriteLine("Co wyszlo:" + item.productID.value);
+                        ProgramName = item.productID.value;
+
+
+                    }
+                    File.WriteAllTextAsync("Sub3.txt", rawResponse);
+                }
+                SubNr = 3;
+            }
+            else
+            {
+                Console.Write("Sh*t happend");
+            }
+
+        }
         public class DataSub1
         {
             public List<DatumDto> data { get; set; }
