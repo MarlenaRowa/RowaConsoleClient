@@ -54,154 +54,161 @@ namespace ProgramNummerCheck
 
         static void Main(string[] args)
         {
-            Console.WriteLine("Conecting");
-
-
-            DataLesen dictLesen = new DataLesen();
-            dictLesen.ReadConfig(@"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\ProgramDict.txt");
-            ValueLesen valueLesen = new ValueLesen();
-            valueLesen.ReadConfig(@"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\ValueDict.txt");
-            // using variables 
-
            
-
-            Console.WriteLine(valueLesen.ValueOnRobot);
-
-            // connection to robot
+           
+                Console.WriteLine("Conecting");
 
             SyncClient syncClient = new SyncClient();
             syncClient.ConnectToHost(IPAddress.Parse(args.Length > 0 ? args[0] : "192.168.1.12"), 7000);  // if IP is different then we need to change here the nr. 
 
 
+            for (; ; )
+            {
+                Subscription1();
+                Subscription2();
+                Subscription3();
 
-            Console.WriteLine("Connected");
-
-
-            // do we need this data?
-
-            string data = DateTime.Now.ToString("yyyy-MM-dd");
-
-            // path to the file for variablen - when it will be on server then it will be to change
-            // string file = @"C:\Users\marlena.knitter\Desktop\DataTest.txt";
-
-            // Add dictionary 1 string - pr name, 2 string last modification datum 
-
-            Dictionary<string, string> ProgramDict = new Dictionary<string, string>();
-            Dictionary<string, int> ValueDict = new Dictionary<string, int>();
-            
-            Variable.Variables ProgramCheck = new Variable.Variables();
-            ProgramDict.Add(ProgramName, Convert.ToString(dictLesen.DataOnRobot));
-            // hier should be :
-            // ProgramName = Name Variable from API 
-
-            if (SubNr == 1)
-            { 
-                // hier starts the code, data for getting programm version starts here 
-                Console.WriteLine("Checking program name");
-            FilePropertiesRequest request26 = new FilePropertiesRequest(@"KRC:\R1\Program\ROWA\" + ProgramName);
+                DataLesen dictLesen = new DataLesen();
+                dictLesen.ReadConfig(@"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\ProgramDict.txt");
+                ValueLesen valueLesen = new ValueLesen();
+                valueLesen.ReadConfig(@"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\ValueDict.txt");
+                // using variables 
 
 
-            Console.WriteLine("Program check sending request");
-            // 
-            FilePropertiesResponse response26 = (FilePropertiesResponse)syncClient.SendRequest(request26);
-            Console.WriteLine("Command: {0}, Success: {1}, ErrorCode: {2}", response26.Type, response26.Success, response26.ErrorCode);
-            Console.ReadLine();
-                if (response26.Success)
+
+                    Console.WriteLine(valueLesen.ValueOnRobot);
+
+                // connection to robot
+
+                Console.WriteLine("Connected");
+
+
+                // do we need this data?
+
+                string data = DateTime.Now.ToString("yyyy-MM-dd");
+
+                // path to the file for variablen - when it will be on server then it will be to change
+                // string file = @"C:\Users\marlena.knitter\Desktop\DataTest.txt";
+
+                // Add dictionary 1 string - pr name, 2 string last modification datum 
+
+                Dictionary<string, string> ProgramDict = new Dictionary<string, string>();
+                Dictionary<string, int> ValueDict = new Dictionary<string, int>();
+
+                Variable.Variables ProgramCheck = new Variable.Variables();
+                ProgramDict.Add(ProgramName, Convert.ToString(dictLesen.DataOnRobot));
+                // hier should be :
+                // ProgramName = Name Variable from API 
+
+                if (SubNr == 1)
                 {
-
-                    // need only this , later wee need only date ??
-
-
-                    Console.WriteLine("    Name: {0}", response26.FileName);
-                    Console.WriteLine("    Last Write Time: {0}", response26.LastWriteTime);
-
-                    // VersDat is a string variable make from data we get from robot
-                    string VersDat = Convert.ToString(response26.LastWriteTime);
-
-                    string VersDatOnRobot = Convert.ToString(dictLesen.DataOnRobot);
-                    Console.WriteLine(VersDatOnRobot);
-                    Console.WriteLine(VersDat);
-                    // check and compare date from file with data gotten from Robot
-
-                    if (ProgramDict.ContainsKey(ProgramName) == true)
-                    {
+                    // hier starts the code, data for getting programm version starts here 
+                    Console.WriteLine("Checking program name");
+                    FilePropertiesRequest request26 = new FilePropertiesRequest(@"KRC:\R1\Program\ROWA\" + ProgramName);
 
 
-
-                        ProgramDict.TryGetValue(ProgramName, out VersDatOnRobot);
-                        Console.WriteLine("old");
-
-                    }
-
-                    else
-                    {
-                        Console.WriteLine("");
-                        ProgramDict.Add(ProgramName, VersDat);
-                        ProgramCheck.VersionOnRobot = 1;
-                        ValueDict.Add(ProgramName, ProgramCheck.VersionOnRobot);
-                        VersDatOnRobot = VersDat;
-
-                    }
-
-
-
-                    if (VersDat != VersDatOnRobot)
-                    {
-                        Console.WriteLine("versdat != versonrobot");
-                        ProgramCheck.VersionOnRobot = valueLesen.ValueOnRobot;
-                        ProgramCheck.VersionOnRobot++;
-                        VersDatOnRobot = VersDat;
-
-                        ProgramDict[ProgramName] = VersDatOnRobot;
-                        ValueDict[ProgramName] = ProgramCheck.VersionOnRobot;
-                    }
-                    else
-                    {
-                        ProgramCheck.VersionOnRobot = valueLesen.ValueOnRobot;
-                        ValueDict[ProgramName] = ProgramCheck.VersionOnRobot;
-                    }
-                    // hier should be variable we are using for sending it away to fiware 
-
-                    #region dict to file 
-                    string filePath = @"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\ProgramDict.txt";
-                    using (FileStream fs = new FileStream(filePath, FileMode.Append))
-                    {
-                        using (TextWriter tw = new StreamWriter(fs))
-
-                            foreach (KeyValuePair<string, string> kvp in ProgramDict)
-                            {
-                                tw.WriteLine(string.Format("{0};{1}", kvp.Key, kvp.Value));
-                            }
-                    }
-
-                    string filePath2 = @"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\ValueDict.txt";
-                    using (FileStream fs = new FileStream(filePath2, FileMode.Append))
-                    {
-                        using (TextWriter tw = new StreamWriter(fs))
-
-                            foreach (KeyValuePair<string, int> kvp1 in ValueDict)
-                            {
-                                tw.WriteLine(string.Format("{0};{1}", kvp1.Key, kvp1.Value));
-                            }
-                    }
-
-                    #endregion
-
-
-                    Console.WriteLine("Data we get:");
-                    Console.WriteLine("Asked PRogram name:" + ProgramName);
-                    Console.WriteLine("gotten from Robot ProgramName:" + response26.FileName);
-                    Console.WriteLine("Version on robot: {0}", ProgramCheck.VersionOnRobot);
-                    Console.WriteLine("VersDat:" + VersDat);
-                    Console.WriteLine("VersDatOnRobot" + VersDatOnRobot);
+                    Console.WriteLine("Program check sending request");
+                    // 
+                    FilePropertiesResponse response26 = (FilePropertiesResponse)syncClient.SendRequest(request26);
+                    Console.WriteLine("Command: {0}, Success: {1}, ErrorCode: {2}", response26.Type, response26.Success, response26.ErrorCode);
                     Console.ReadLine();
-                    Console.WriteLine("Checking programm");
+                    if (response26.Success)
+                    {
 
-                    VersionOnRobot = ProgramCheck.VersionOnRobot;
+                        // need only this , later wee need only date ??
 
+
+                        Console.WriteLine("    Name: {0}", response26.FileName);
+                        Console.WriteLine("    Last Write Time: {0}", response26.LastWriteTime);
+
+                        // VersDat is a string variable make from data we get from robot
+                        string VersDat = Convert.ToString(response26.LastWriteTime);
+
+                        string VersDatOnRobot = Convert.ToString(dictLesen.DataOnRobot);
+                        Console.WriteLine(VersDatOnRobot);
+                        Console.WriteLine(VersDat);
+                        // check and compare date from file with data gotten from Robot
+
+                        if (ProgramDict.ContainsKey(ProgramName) == true)
+                        {
+
+
+
+                            ProgramDict.TryGetValue(ProgramName, out VersDatOnRobot);
+                            Console.WriteLine("old");
+
+                        }
+
+                        else
+                        {
+                            Console.WriteLine("");
+                            ProgramDict.Add(ProgramName, VersDat);
+                            ProgramCheck.VersionOnRobot = 1;
+                            ValueDict.Add(ProgramName, ProgramCheck.VersionOnRobot);
+                            VersDatOnRobot = VersDat;
+
+                        }
+
+
+
+                        if (VersDat != VersDatOnRobot)
+                        {
+                            Console.WriteLine("versdat != versonrobot");
+                            ProgramCheck.VersionOnRobot = valueLesen.ValueOnRobot;
+                            ProgramCheck.VersionOnRobot++;
+                            VersDatOnRobot = VersDat;
+
+                            ProgramDict[ProgramName] = VersDatOnRobot;
+                            ValueDict[ProgramName] = ProgramCheck.VersionOnRobot;
+                        }
+                        else
+                        {
+                            ProgramCheck.VersionOnRobot = valueLesen.ValueOnRobot;
+                            ValueDict[ProgramName] = ProgramCheck.VersionOnRobot;
+                        }
+                        // hier should be variable we are using for sending it away to fiware 
+
+                        #region dict to file 
+                        string filePath = @"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\ProgramDict.txt";
+                        using (FileStream fs = new FileStream(filePath, FileMode.Append))
+                        {
+                            using (TextWriter tw = new StreamWriter(fs))
+
+                                foreach (KeyValuePair<string, string> kvp in ProgramDict)
+                                {
+                                    tw.WriteLine(string.Format("{0};{1}", kvp.Key, kvp.Value));
+                                }
+                        }
+
+                        string filePath2 = @"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\ValueDict.txt";
+                        using (FileStream fs = new FileStream(filePath2, FileMode.Append))
+                        {
+                            using (TextWriter tw = new StreamWriter(fs))
+
+                                foreach (KeyValuePair<string, int> kvp1 in ValueDict)
+                                {
+                                    tw.WriteLine(string.Format("{0};{1}", kvp1.Key, kvp1.Value));
+                                }
+                        }
+
+                        #endregion
+
+
+                        Console.WriteLine("Data we get:");
+                        Console.WriteLine("Asked PRogram name:" + ProgramName);
+                        Console.WriteLine("gotten from Robot ProgramName:" + response26.FileName);
+                        Console.WriteLine("Version on robot: {0}", ProgramCheck.VersionOnRobot);
+                        Console.WriteLine("VersDat:" + VersDat);
+                        Console.WriteLine("VersDatOnRobot" + VersDatOnRobot);
+                        Console.ReadLine();
+                        Console.WriteLine("Checking programm");
+
+                        VersionOnRobot = ProgramCheck.VersionOnRobot;
+                        Answer();
+
+                    }
+                    //for program uploading to  server
                 }
-                //for program uploading to  server
-
 
                 if (SubNr == 2)
                 {
@@ -231,11 +238,17 @@ namespace ProgramNummerCheck
                     response1 = syncClient.SendRequest(new CopyFileRequest(@"C:\Users\marlena.knitter\Desktop\ProgTest" + ProgramName, @"KRC:\R1\PROGRAM\ROWA\"));
                     Console.WriteLine("Command: {0}, Success: {1}, ErrorCode: {2}", response1.Type, response1.Success, response1.ErrorCode);
                     Console.ReadLine();
+
                 }
-            }
 
+                SubNr = 0;
 
+            }   
+          
         }
+
+
+        
 
         public static void Subscription1()
 
@@ -262,8 +275,9 @@ namespace ProgramNummerCheck
 
                     }
                    File.WriteAllTextAsync("Sub1.txt", rawResponse);
+                    SubNr = 1;
                 }
-                SubNr = 1;
+               
             }
             else
             {
@@ -280,11 +294,11 @@ namespace ProgramNummerCheck
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                string Sub1 = System.IO.File.ReadAllText(@"C:\Users\marlena.knitter\Desktop\RoboBox\RowaKukaKlientAlpha\RowaConsoleClient\Sub2.txt");
+                string Sub2 = System.IO.File.ReadAllText(@"C:\Users\marlena.knitter\Desktop\RoboBox\RowaKukaKlientAlpha\RowaConsoleClient\Sub2.txt");
 
                 string rawResponse = response.Content;
 
-                if (Sub1 != rawResponse)
+                if (Sub2 != rawResponse)
                 {
                     Console.WriteLine(rawResponse);
                     DataSub1 datumDto = new JavaScriptSerializer().Deserialize<DataSub1>(rawResponse); ;
@@ -296,8 +310,9 @@ namespace ProgramNummerCheck
 
                     }
                     File.WriteAllTextAsync("Sub3.txt", rawResponse);
+                    SubNr = 2;
                 }
-                SubNr = 2;
+                
             }
             else
             {
@@ -314,11 +329,11 @@ namespace ProgramNummerCheck
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                string Sub1 = System.IO.File.ReadAllText(@"C:\Users\marlena.knitter\Desktop\RoboBox\RowaKukaKlientAlpha\RowaConsoleClient\Sub3.txt");
+                string Sub3 = System.IO.File.ReadAllText(@"C:\Users\marlena.knitter\Desktop\RoboBox\RowaKukaKlientAlpha\RowaConsoleClient\Sub3.txt");
 
                 string rawResponse = response.Content;
 
-                if (Sub1 != rawResponse)
+                if (Sub3 != rawResponse)
                 {
                     Console.WriteLine(rawResponse);
                     DataSub1 datumDto = new JavaScriptSerializer().Deserialize<DataSub1>(rawResponse); ;
@@ -330,8 +345,9 @@ namespace ProgramNummerCheck
 
                     }
                     File.WriteAllTextAsync("Sub3.txt", rawResponse);
+                    SubNr = 3;
                 }
-                SubNr = 3;
+                
             }
             else
             {
