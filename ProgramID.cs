@@ -256,10 +256,10 @@ namespace ProgramNummerCheck
                     DataSub1 datumDto = new JavaScriptSerializer().Deserialize<DataSub1>(rawResponse); ;
                     foreach (var item in datumDto.data)
                     {
-                        Console.WriteLine("Co wyszlo:" + item.id);
-                        ProgramName = item.id;
+                        Console.WriteLine("Co wyszlo:" + item.productID.value);
+                        ProgramName = item.productID.value;
 
-                        
+
                     }
                    File.WriteAllTextAsync("Sub1.txt", rawResponse);
                 }
@@ -279,7 +279,27 @@ namespace ProgramNummerCheck
         }
         public class DatumDto
         {
-            public string id { get; set; }
+            public ProductID productID {get; set;}
+        }
+        public class ProductID
+        {
+
+            public string value { get; set; }
+        }
+
+
+        public static void Answer()
+        {
+
+            var client = new RestClient("http://localhost:1026/");
+            var request = new RestRequest("v2/entities/Robot1/attrs/writeOrderstatus?type=Order", Method.Put);
+            request.AddHeader("fiware-service", "robot_info");
+            request.AddHeader("fiware-servicepath", "/demo");
+            request.AddHeader("Content-Type", "application/json");
+            var body = @"{ ""value"": [" + VersionOnRobot + @",""test"",""test2"",""test3"",""test4"",""test5""]," + "\n" +
+            @"   ""type"": ""command""" + "\n" + @"}";
+            request.AddParameter("application/json", body, ParameterType.RequestBody);
+
         }
 
     }
