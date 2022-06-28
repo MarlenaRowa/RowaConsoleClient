@@ -324,7 +324,6 @@ namespace ProgramNummerCheck
                         SubNr = 1;
                         GetDataID();
 
-                        Console.Write("SubNr1=" + SubNr);
                     }
                     catch (Exception ex)
 
@@ -464,6 +463,9 @@ namespace ProgramNummerCheck
                 else
                 {
                     Console.Write("Sh*t happend");
+                    Console.WriteLine("pok  PR NAME: " + ProgrammName);
+                    if (ProgrammName == null)
+                        SubNr = 0;
                 }
             }
 
@@ -503,6 +505,9 @@ namespace ProgramNummerCheck
 
 
                     Console.WriteLine("programName:{0}, PlanCycTime:{1}, procLenght:{2}", ProgrammName, planCycleTime, processingLength);
+
+
+
                 }
                     catch (NullReferenceException ex)
                     {
@@ -511,9 +516,13 @@ namespace ProgramNummerCheck
                 else
                 {
                     Console.Write("Sh*t happend");
-                }
 
-            
+            }
+
+
+
+
+
         }
         #region variable
 
