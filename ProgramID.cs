@@ -17,14 +17,17 @@ namespace ProgramNummerCheck
 
         public void ReadConfig(string txtFile1)
         {
-            Variable.Variables DataLesen = new Variable.Variables();
-            var dict = File.ReadAllLines(txtFile1)
-                           .Select(l => l.Split(new[] { ';' }))
-                           .ToDictionary(s => s[0].Trim(), s => s[1].Trim());  // read the entire file into a dictionary.
 
-            DataOnRobot = Convert.ToString(dict[DataLesen.Name]);
-            //ForTesting
-            Console.WriteLine(dict[DataLesen.Name]);
+                Variable.Variables DataLesen = new Variable.Variables();
+                var dict = File.ReadAllLines(txtFile1)
+                               .Select(l => l.Split(new[] { ';' }))
+                               .ToDictionary(s => s[0].Trim(), s => s[1].Trim());  // read the entire file into a dictionary.
+
+                DataOnRobot = Convert.ToString(dict[DataLesen.Name]);
+
+            
+
+
         }
 
     }
@@ -34,14 +37,15 @@ namespace ProgramNummerCheck
 
         public void ReadConfig(string txtFile1)
         {
-            Variable.Variables ValueLesen = new Variable.Variables();
+
+                Variable.Variables ValueLesen = new Variable.Variables();
             var dict = File.ReadAllLines(txtFile1)
                            .Select(l => l.Split(new[] { ';' }))
                            .ToDictionary(s => s[0].Trim(), s => s[1].Trim());  // read the entire file into a dictionary.
 
             ValueOnRobot = Convert.ToInt32(dict[ValueLesen.Name]);
-            //ForTesting
-            Console.WriteLine("value:" + ValueOnRobot);
+
+
         }
     }
     #endregion
@@ -49,7 +53,20 @@ namespace ProgramNummerCheck
     public class ProgramNummer
     {
         private static int SubNr;
-        private static string? ProgramName;
+        private static string? IDName;
+        private static string? OrderID;
+
+        private static string? ProgrammName;
+        private static string? deadline;
+        private static string? finishedTime;
+        private static string? orderStatus;
+        private static int planParts;
+        private static int prodParts;
+        private static string? startTime;
+        private static string? workingStation;
+
+        private static int planCycleTime;
+        private static int processingLength;
         private static float VersionOnRobot;
 
         static void Main(string[] args)
@@ -62,25 +79,35 @@ namespace ProgramNummerCheck
             syncClient.ConnectToHost(IPAddress.Parse(args.Length > 0 ? args[0] : "192.168.1.12"), 7000);  // if IP is different then we need to change here the nr. 
 
 
+
+
+
             for (; ; )
+
             {
+
+
+
+
+
+                // using variables
+
                 Subscription1();
                 Subscription2();
                 Subscription3();
+
+
 
                 DataLesen dictLesen = new DataLesen();
                 dictLesen.ReadConfig(@"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\ProgramDict.txt");
                 ValueLesen valueLesen = new ValueLesen();
                 valueLesen.ReadConfig(@"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\ValueDict.txt");
-                // using variables 
 
-
-
-                    Console.WriteLine(valueLesen.ValueOnRobot);
+                //Console.WriteLine(valueLesen.ValueOnRobot);
 
                 // connection to robot
 
-                Console.WriteLine("Connected");
+                // Console.WriteLine("Connected");
 
 
                 // do we need this data?
@@ -96,7 +123,15 @@ namespace ProgramNummerCheck
                 Dictionary<string, int> ValueDict = new Dictionary<string, int>();
 
                 Variable.Variables ProgramCheck = new Variable.Variables();
-                ProgramDict.Add(ProgramName, Convert.ToString(dictLesen.DataOnRobot));
+                try
+                {
+                    ProgramDict.Add(ProgrammName, Convert.ToString(dictLesen.DataOnRobot));
+                }
+                catch (Exception ex)
+                {
+                    ProgramDict.Add("0", data);
+
+                }
                 // hier should be :
                 // ProgramName = Name Variable from API 
 
@@ -104,14 +139,13 @@ namespace ProgramNummerCheck
                 {
                     // hier starts the code, data for getting programm version starts here 
                     Console.WriteLine("Checking program name");
-                    FilePropertiesRequest request26 = new FilePropertiesRequest(@"KRC:\R1\Program\ROWA\" + ProgramName);
+                    FilePropertiesRequest request26 = new FilePropertiesRequest(@"KRC:\R1\Program\ROWA\" + ProgrammName);
 
 
                     Console.WriteLine("Program check sending request");
                     // 
                     FilePropertiesResponse response26 = (FilePropertiesResponse)syncClient.SendRequest(request26);
                     Console.WriteLine("Command: {0}, Success: {1}, ErrorCode: {2}", response26.Type, response26.Success, response26.ErrorCode);
-                    Console.ReadLine();
                     if (response26.Success)
                     {
 
@@ -129,12 +163,13 @@ namespace ProgramNummerCheck
                         Console.WriteLine(VersDat);
                         // check and compare date from file with data gotten from Robot
 
-                        if (ProgramDict.ContainsKey(ProgramName) == true)
+                        
+                        if (ProgramDict.ContainsKey(ProgrammName) == true)
                         {
 
 
 
-                            ProgramDict.TryGetValue(ProgramName, out VersDatOnRobot);
+                            ProgramDict.TryGetValue(ProgrammName, out VersDatOnRobot);
                             Console.WriteLine("old");
 
                         }
@@ -142,9 +177,9 @@ namespace ProgramNummerCheck
                         else
                         {
                             Console.WriteLine("");
-                            ProgramDict.Add(ProgramName, VersDat);
+                            ProgramDict.Add(ProgrammName, VersDat);
                             ProgramCheck.VersionOnRobot = 1;
-                            ValueDict.Add(ProgramName, ProgramCheck.VersionOnRobot);
+                            ValueDict.Add(ProgrammName, ProgramCheck.VersionOnRobot);
                             VersDatOnRobot = VersDat;
 
                         }
@@ -158,30 +193,32 @@ namespace ProgramNummerCheck
                             ProgramCheck.VersionOnRobot++;
                             VersDatOnRobot = VersDat;
 
-                            ProgramDict[ProgramName] = VersDatOnRobot;
-                            ValueDict[ProgramName] = ProgramCheck.VersionOnRobot;
+                            ProgramDict[ProgrammName] = VersDatOnRobot;
+                            ValueDict[ProgrammName] = ProgramCheck.VersionOnRobot;
                         }
                         else
                         {
                             ProgramCheck.VersionOnRobot = valueLesen.ValueOnRobot;
-                            ValueDict[ProgramName] = ProgramCheck.VersionOnRobot;
+                            ValueDict[ProgrammName] = ProgramCheck.VersionOnRobot;
                         }
                         // hier should be variable we are using for sending it away to fiware 
 
                         #region dict to file 
                         string filePath = @"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\ProgramDict.txt";
-                        using (FileStream fs = new FileStream(filePath, FileMode.Append))
+                        using (FileStream fs = new FileStream(filePath, FileMode.OpenOrCreate))
                         {
                             using (TextWriter tw = new StreamWriter(fs))
 
                                 foreach (KeyValuePair<string, string> kvp in ProgramDict)
                                 {
-                                    tw.WriteLine(string.Format("{0};{1}", kvp.Key, kvp.Value));
+                                  
+                                        tw.WriteLine(string.Format("{0};{1}", kvp.Key, kvp.Value));
+                                    
                                 }
                         }
 
                         string filePath2 = @"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\ValueDict.txt";
-                        using (FileStream fs = new FileStream(filePath2, FileMode.Append))
+                        using (FileStream fs = new FileStream(filePath2, FileMode.OpenOrCreate))
                         {
                             using (TextWriter tw = new StreamWriter(fs))
 
@@ -195,32 +232,35 @@ namespace ProgramNummerCheck
 
 
                         Console.WriteLine("Data we get:");
-                        Console.WriteLine("Asked PRogram name:" + ProgramName);
+                        Console.WriteLine("Asked PRogram name:" + ProgrammName);
                         Console.WriteLine("gotten from Robot ProgramName:" + response26.FileName);
                         Console.WriteLine("Version on robot: {0}", ProgramCheck.VersionOnRobot);
                         Console.WriteLine("VersDat:" + VersDat);
                         Console.WriteLine("VersDatOnRobot" + VersDatOnRobot);
-                        Console.ReadLine();
                         Console.WriteLine("Checking programm");
 
                         VersionOnRobot = ProgramCheck.VersionOnRobot;
                         Answer();
-
+                        SubNr = 0;
                     }
                     //for program uploading to  server
                 }
 
                 if (SubNr == 2)
                 {
-                    SetFileAttributesRequest request20 = new SetFileAttributesRequest(@"KRC:\R1\Program\ROWA\" + ProgramName, ItemAttribute.None, ItemAttribute.None);
+                    Console.WriteLine("Jestem W sub 2");
+                    Console.WriteLine(ProgrammName);
+
+                    SetFileAttributesRequest request20 = new SetFileAttributesRequest(@"KRC:\R1\Program\ROWA\" + ProgrammName, ItemAttribute.None, ItemAttribute.None);
                     Console.WriteLine(request20);
 
                     Response response = syncClient.SendRequest(request20);
 
                     // Move
-                    response = syncClient.SendRequest(new CopyFileRequest(@"KRC:\R1\Program\ROWA\" + ProgramName, @"E:\" + ProgramName + "-" + data));
+                    response = syncClient.SendRequest(new CopyFileRequest(@"KRC:\R1\Program\ROWA\" + ProgrammName, @"E:\" + ProgrammName + "-" + data));
                     Console.WriteLine("Command: {0}, Success: {1}, ErrorCode: {2}", response.Type, response.Success, response.ErrorCode);
                     Console.ReadLine();
+                    SubNr = 0;
                 }
 
 
@@ -228,23 +268,26 @@ namespace ProgramNummerCheck
 
                 if (SubNr == 3)
                 {
-
+                    Console.WriteLine("Jestem W sub 3");
+                    Console.WriteLine(ProgrammName);
 
                     // //code for program download, to here must be API subscription which says what program is to check - check if works or no interface fault
-                    SetFileAttributesRequest request21 = new SetFileAttributesRequest(@"C:\Users\marlena.knitter\Desktop\ProgTest\" + ProgramName, ItemAttribute.None, ItemAttribute.None);
+                    SetFileAttributesRequest request21 = new SetFileAttributesRequest(@"E:\" + ProgrammName, ItemAttribute.None, ItemAttribute.None);
 
                     Response response1 = syncClient.SendRequest(request21);
                     // Move
-                    response1 = syncClient.SendRequest(new CopyFileRequest(@"C:\Users\marlena.knitter\Desktop\ProgTest" + ProgramName, @"KRC:\R1\PROGRAM\ROWA\"));
+                    response1 = syncClient.SendRequest(new CopyFileRequest(@"E:\" + ProgrammName, @"KRC:\R1\PROGRAM\ROWA\" + ProgrammName));
                     Console.WriteLine("Command: {0}, Success: {1}, ErrorCode: {2}", response1.Type, response1.Success, response1.ErrorCode);
                     Console.ReadLine();
 
+                    SubNr = 0;
+
                 }
 
-                SubNr = 0;
 
-            }   
-          
+
+
+            }
         }
 
 
@@ -253,29 +296,40 @@ namespace ProgramNummerCheck
         public static void Subscription1()
 
         {
+    
             var client = new RestClient("http://localhost:5011/");
             var request = new RestRequest("/Subscription1");
             var response = client.Execute(request);
-
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                string Sub1 = System.IO.File.ReadAllText(@"C:\Users\marlena.knitter\Desktop\RoboBox\RowaKukaKlientAlpha\RowaConsoleClient\Sub1.txt");
+
+                
+                string Sub1 = System.IO.File.ReadAllText(@"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\Sub1.txt");
 
                 string rawResponse = response.Content;
 
                 if (Sub1 != rawResponse)
                 {
-                    Console.WriteLine(rawResponse);
-                    DataSub1 datumDto = new JavaScriptSerializer().Deserialize<DataSub1>(rawResponse); ;
-                    foreach (var item in datumDto.data)
+                    try
                     {
-                        Console.WriteLine("Co wyszlo:" + item.productID.value);
-                        ProgramName = item.productID.value;
+                        DataSub1 datumDto = new JavaScriptSerializer().Deserialize<DataSub1>(rawResponse); ;
+                        foreach (var item in datumDto.data)
+                        {
+                            Console.WriteLine("coJest" + item.productID.value);
+                            IDName = item.productID.value;
 
+                        }
 
+                        File.WriteAllTextAsync(@"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\Sub1.txt", rawResponse);
+                        SubNr = 1;
+                        GetDataID();
+
+                        Console.Write("SubNr1=" + SubNr);
                     }
-                   File.WriteAllTextAsync("Sub1.txt", rawResponse);
-                    SubNr = 1;
+                    catch (Exception ex)
+
+                    {
+                    }
                 }
                
             }
@@ -294,23 +348,31 @@ namespace ProgramNummerCheck
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                string Sub2 = System.IO.File.ReadAllText(@"C:\Users\marlena.knitter\Desktop\RoboBox\RowaKukaKlientAlpha\RowaConsoleClient\Sub2.txt");
+                string Sub2 = System.IO.File.ReadAllText(@"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\Sub2.txt");
 
                 string rawResponse = response.Content;
 
                 if (Sub2 != rawResponse)
                 {
-                    Console.WriteLine(rawResponse);
-                    DataSub1 datumDto = new JavaScriptSerializer().Deserialize<DataSub1>(rawResponse); ;
+
+                    try
+                    {
+                        DataSub1 datumDto = new JavaScriptSerializer().Deserialize<DataSub1>(rawResponse); ;
                     foreach (var item in datumDto.data)
                     {
-                        Console.WriteLine("Co wyszlo:" + item.productID.value);
-                        ProgramName = item.productID.value;
 
+                        IDName = item.productID.value;
+                        
 
                     }
-                    File.WriteAllTextAsync("Sub3.txt", rawResponse);
+                    File.WriteAllTextAsync(@"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\Sub2.txt", rawResponse);
                     SubNr = 2;
+                    GetDataID();
+                    }
+                    catch (Exception ex)
+
+                    {
+                    }
                 }
                 
             }
@@ -329,24 +391,31 @@ namespace ProgramNummerCheck
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                string Sub3 = System.IO.File.ReadAllText(@"C:\Users\marlena.knitter\Desktop\RoboBox\RowaKukaKlientAlpha\RowaConsoleClient\Sub3.txt");
+                string Sub3 = System.IO.File.ReadAllText(@"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\Sub3.txt");
 
                 string rawResponse = response.Content;
 
                 if (Sub3 != rawResponse)
                 {
-                    Console.WriteLine(rawResponse);
-                    DataSub1 datumDto = new JavaScriptSerializer().Deserialize<DataSub1>(rawResponse); ;
+         
+                    try
+                    {
+                        DataSub1 datumDto = new JavaScriptSerializer().Deserialize<DataSub1>(rawResponse); ;
                     foreach (var item in datumDto.data)
                     {
-                        Console.WriteLine("Co wyszlo:" + item.productID.value);
-                        ProgramName = item.productID.value;
 
+                        IDName = item.productID.value;
 
                     }
-                    File.WriteAllTextAsync("Sub3.txt", rawResponse);
+                    File.WriteAllTextAsync(@"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\Sub3.txt", rawResponse);
                     SubNr = 3;
+                    GetDataID();
                 }
+                    catch (Exception ex)
+
+                {
+                }
+            }
                 
             }
             else
@@ -355,6 +424,99 @@ namespace ProgramNummerCheck
             }
 
         }
+
+        public static void GetDataID()
+
+        {
+
+                Console.WriteLine("Co wyszlo:" + IDName);
+                var client = new RestClient("http://localhost:1026/");
+                var request = new RestRequest("/v2/entities/" + IDName);
+                request.AddHeader("fiware-service", "opcua_car");
+                request.AddHeader("fiware-servicepath", "/demo");
+                var response = client.Execute(request);
+            if (IDName != null)
+            {
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    //    string Sub1 = System.IO.File.ReadAllText(@"C:\Users\marlena.knitter\Source\Repos\CSharpApp-\test.txt");
+
+                    string rawResponse1 = response.Content;
+
+                    //if (Sub1 != rawResponse)
+                    //{
+                    Console.WriteLine("poszlo");
+                    Console.WriteLine(rawResponse1);
+                    IdName itemID = new JavaScriptSerializer().Deserialize<IdName>(rawResponse1);
+
+
+                    OrderID = itemID.productID.value;
+                    deadline = itemID.deadline.value;
+                    finishedTime = itemID.finishedTime.value;
+                    orderStatus = itemID.orderStatus.value;
+                    planParts = itemID.planParts.value;
+                    prodParts = itemID.prodParts.value;
+                    startTime = itemID.startTime.value;
+                    workingStation = itemID.workingStation.value;
+                    //Console.WriteLine("order:{0}, deadline:{1}, finishedTime:{2}, orderStatus:{3}, planParts:{4}, prodParts :{5}, StartTime:{6}, workSt:{7} ", OrderID, deadline, finishedTime, orderStatus, planParts, prodParts, startTime, workingStation);
+                    GetProgramData();
+                }
+                else
+                {
+                    Console.Write("Sh*t happend");
+                }
+            }
+
+           
+
+        }
+
+
+
+        public static void GetProgramData()
+
+        {
+
+                Console.WriteLine("Co wyszlo:" + OrderID);
+                var client = new RestClient("http://localhost:1026/");
+                var request = new RestRequest("/v2/entities/" + OrderID);
+                request.AddHeader("fiware-service", "opcua_car");
+                request.AddHeader("fiware-servicepath", "/demo");
+                var response = client.Execute(request);
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    //    string Sub1 = System.IO.File.ReadAllText(@"C:\Users\marlena.knitter\Source\Repos\CSharpApp-\test.txt");
+
+                    string rawResponse2 = response.Content;
+
+                    //if (Sub1 != rawResponse)
+                    //{
+                    Console.WriteLine("poszlo");
+                    Console.WriteLine(rawResponse2);
+                    ProductName programName = new JavaScriptSerializer().Deserialize<ProductName>(rawResponse2);
+                    try
+                    {
+
+                        ProgrammName = programName.programName.value;
+                        planCycleTime = Convert.ToInt32(programName.planCycleTime.value);
+                        processingLength = Convert.ToInt32(programName.processingLength.value);
+
+
+                    Console.WriteLine("programName:{0}, PlanCycTime:{1}, procLenght:{2}", ProgrammName, planCycleTime, processingLength);
+                }
+                    catch (NullReferenceException ex)
+                    {
+                    }
+                }
+                else
+                {
+                    Console.Write("Sh*t happend");
+                }
+
+            
+        }
+        #region variable
+
         public class DataSub1
         {
             public List<DatumDto> data { get; set; }
@@ -362,7 +524,7 @@ namespace ProgramNummerCheck
         }
         public class DatumDto
         {
-            public ProductID productID {get; set;}
+            public ProductID productID { get; set; }
         }
         public class ProductID
         {
@@ -370,6 +532,78 @@ namespace ProgramNummerCheck
             public string value { get; set; }
         }
 
+        public class IdName
+        {
+
+            public ItemID productID { get; set; }
+            public Deadline deadline { get; set; }
+            public FinishedTime finishedTime { get; set; }
+            public OrderStatus orderStatus { get; set; }
+            public PlanParts planParts { get; set; }
+            public ProdParts prodParts { get; set; }
+            public StartTime startTime { get; set; }
+            public WorkingStation workingStation { get; set; }
+
+        }
+
+        public class ItemID
+        {
+            public string value { get; set; }
+        }
+
+        public class Deadline
+        {
+            public string value { get; set; }
+        }
+        public class FinishedTime
+        {
+            public string value { get; set; }
+        }
+        public class OrderStatus
+        {
+            public string value { get; set; }
+        }
+        public class PlanParts
+        {
+            public int value { get; set; }
+        }
+        public class ProdParts
+        {
+            public int value { get; set; }
+        }
+        public class StartTime
+        {
+            public string value { get; set; }
+        }
+        public class WorkingStation
+        {
+            public string value { get; set; }
+        }
+
+
+        public class ProductName
+        {
+
+            public ProgramName programName { get; set; }
+            public PlanCycleTime planCycleTime { get; set; }
+            public ProcessingLength processingLength { get; set; }
+
+
+        }
+
+        public class ProgramName
+        {
+            public string value { get; set; }
+        }
+        public class PlanCycleTime
+        {
+            public int value { get; set; }
+        }
+        public class ProcessingLength
+        {
+            public int value { get; set; }
+        }
+#endregion
 
         public static void Answer()
         {
@@ -379,8 +613,10 @@ namespace ProgramNummerCheck
             request.AddHeader("fiware-service", "robot_info");
             request.AddHeader("fiware-servicepath", "/demo");
             request.AddHeader("Content-Type", "application/json");
-            var body = @"{ ""value"": [" + VersionOnRobot + @",""test"",""test2"",""test3"",""test4"",""test5""]," + "\n" +
+            var body = @"{ ""value"": [""" + orderStatus + @""", """ + IDName + @""", """ + ProgrammName + @""", """ + OrderID + @""", " + VersionOnRobot + @", " + VersionOnRobot  + @", " + planCycleTime + @", " + planParts +  "]," + "\n" +
             @"   ""type"": ""command""" + "\n" + @"}";
+
+            Console.WriteLine(body);
             request.AddParameter("application/json", body, ParameterType.RequestBody);
 
         }
