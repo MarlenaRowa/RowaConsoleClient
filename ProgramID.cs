@@ -4,6 +4,7 @@ using C3SharpInterface.Responses;
 using Nancy.Json;
 using RestSharp;
 using System.Net;
+using System.Text;
 
 namespace ProgramNummerCheck
 {
@@ -13,15 +14,15 @@ namespace ProgramNummerCheck
 
     public class DataLesen
     {
-        public object DataOnRobot { get;  set; }
+        public object DataOnRobot { get; set; }
 
         public void ReadConfig(string txtFile1)
         {
 
-                Variable.Variables DataLesen = new Variable.Variables();
-                var dict = File.ReadAllLines(txtFile1)
-                               .Select(l => l.Split(new[] { ';' }))
-                               .ToDictionary(s => s[0].Trim(), s => s[1].Trim());  // read the entire file into a dictionary.
+            Variable.Variables DataLesen = new Variable.Variables();
+            var dict = File.ReadAllLines(txtFile1)
+                           .Select(l => l.Split(new[] { ';' }))
+                           .ToDictionary(s => s[0].Trim(), s => s[1].Trim());  // read the entire file into a dictionary.
 
             try  // exception for new programms
             {
@@ -44,7 +45,7 @@ namespace ProgramNummerCheck
         public void ReadConfig(string txtFile1)
         {
 
-                Variable.Variables ValueLesen = new Variable.Variables();
+            Variable.Variables ValueLesen = new Variable.Variables();
             var dict = File.ReadAllLines(txtFile1)
                            .Select(l => l.Split(new[] { ';' }))
                            .ToDictionary(s => s[0].Trim(), s => s[1].Trim());  // read the entire file into a dictionary.
@@ -84,8 +85,8 @@ namespace ProgramNummerCheck
 
         static void Main(string[] args)
         {
-           
-           
+
+
 
             SyncClient syncClient = new SyncClient();
             syncClient.ConnectToHost(IPAddress.Parse(args.Length > 0 ? args[0] : "192.168.1.12"), 7000);  // if IP is different then we need to change it here. 
@@ -111,7 +112,7 @@ namespace ProgramNummerCheck
                 ValueLesen valueLesen = new ValueLesen();
                 valueLesen.ReadConfig(@"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\ValueDict.txt");
 
-               
+
 
                 string data = DateTime.Now.ToString("yyyy-MM-dd");
 
@@ -138,7 +139,7 @@ namespace ProgramNummerCheck
                     FilePropertiesRequest request26 = new FilePropertiesRequest(@"KRC:\R1\Program\ROWA\" + ProgrammName);
 
 
-                
+
                     // 
                     FilePropertiesResponse response26 = (FilePropertiesResponse)syncClient.SendRequest(request26);
                     if (response26.Success)
@@ -189,32 +190,32 @@ namespace ProgramNummerCheck
 
                         #region dict to file 
                         string lines = System.IO.File.ReadAllText(@"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\ProgramDict.txt");
-                       
-                            if (lines.Contains(ProgrammName))
+
+                        if (lines.Contains(ProgrammName))
+                        {
                             {
-                                {
-                                    lines = lines.Replace(ProgrammName + ";" + dictLesen.DataOnRobot, ProgrammName + ";" + VersDatOnRobot);
-
-                                }
-                                File.WriteAllText(@"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\ProgramDict.txt", lines);
-                            }
-                            else
-                            {
-                            
-                                 string filePath = @"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\ProgramDict.txt";
-                                 using (FileStream fs = new FileStream(filePath, FileMode.Append))
-                                 {
-                                 using (TextWriter tw = new StreamWriter(fs))
-
-                                 foreach (KeyValuePair<string, string> kvp in ProgramDict)
-                                      {
-
-                                    tw.WriteLine(string.Format("{0};{1}", kvp.Key, kvp.Value));
-
-                                     }
-                                 }
+                                lines = lines.Replace(ProgrammName + ";" + dictLesen.DataOnRobot, ProgrammName + ";" + VersDatOnRobot);
 
                             }
+                            File.WriteAllText(@"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\ProgramDict.txt", lines);
+                        }
+                        else
+                        {
+
+                            string filePath = @"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\ProgramDict.txt";
+                            using (FileStream fs = new FileStream(filePath, FileMode.Append))
+                            {
+                                using (TextWriter tw = new StreamWriter(fs))
+
+                                    foreach (KeyValuePair<string, string> kvp in ProgramDict)
+                                    {
+
+                                        tw.WriteLine(string.Format("{0};{1}", kvp.Key, kvp.Value));
+
+                                    }
+                            }
+
+                        }
                         string lines2 = System.IO.File.ReadAllText(@"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\ValueDict.txt");
 
                         if (lines2.Contains(ProgrammName))
@@ -228,15 +229,15 @@ namespace ProgramNummerCheck
                         else
                         {
                             string filePath2 = @"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\ValueDict.txt";
-                        using (FileStream fs = new FileStream(filePath2, FileMode.Append))
-                        {
-                            using (TextWriter tw = new StreamWriter(fs))
+                            using (FileStream fs = new FileStream(filePath2, FileMode.Append))
+                            {
+                                using (TextWriter tw = new StreamWriter(fs))
 
-                                foreach (KeyValuePair<string, int> kvp1 in ValueDict)
-                                {
-                                    tw.WriteLine(string.Format("{0};{1}", kvp1.Key, kvp1.Value));
-                                }
-                        }
+                                    foreach (KeyValuePair<string, int> kvp1 in ValueDict)
+                                    {
+                                        tw.WriteLine(string.Format("{0};{1}", kvp1.Key, kvp1.Value));
+                                    }
+                            }
 
                         }
 
@@ -296,19 +297,19 @@ namespace ProgramNummerCheck
         }
 
 
-        
+
 
         public static void Subscription1()
 
         {
-    
+
             var client = new RestClient("http://localhost:5011/");
             var request = new RestRequest("/Subscription1");
             var response = client.Execute(request);
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
 
-                
+
                 string Sub1 = System.IO.File.ReadAllText(@"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\Sub1.txt");
 
                 string rawResponse = response.Content;
@@ -335,7 +336,7 @@ namespace ProgramNummerCheck
                     {
                     }
                 }
-               
+
             }
             else
             {
@@ -362,23 +363,23 @@ namespace ProgramNummerCheck
                     try
                     {
                         DataSub1 datumDto = new JavaScriptSerializer().Deserialize<DataSub1>(rawResponse); ;
-                    foreach (var item in datumDto.data)
-                    {
+                        foreach (var item in datumDto.data)
+                        {
 
-                        IDName = item.productID.value;
-                        
+                            IDName = item.productID.value;
 
-                    }
-                    File.WriteAllTextAsync(@"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\Sub2.txt", rawResponse);
-                    SubNr = 2;
-                    GetDataID();
+
+                        }
+                        File.WriteAllTextAsync(@"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\Sub2.txt", rawResponse);
+                        SubNr = 2;
+                        GetDataID();
                     }
                     catch (Exception ex)
 
                     {
                     }
                 }
-                
+
             }
             else
             {
@@ -401,26 +402,26 @@ namespace ProgramNummerCheck
 
                 if (Sub3 != rawResponse)
                 {
-         
+
                     try
                     {
                         DataSub1 datumDto = new JavaScriptSerializer().Deserialize<DataSub1>(rawResponse); ;
-                    foreach (var item in datumDto.data)
-                    {
+                        foreach (var item in datumDto.data)
+                        {
 
-                        IDName = item.productID.value;
+                            IDName = item.productID.value;
 
+                        }
+                        File.WriteAllTextAsync(@"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\Sub3.txt", rawResponse);
+                        SubNr = 3;
+                        GetDataID();
                     }
-                    File.WriteAllTextAsync(@"C:\Users\marlena.knitter\Desktop\RoboSonic\RowaConsoleClient\Sub3.txt", rawResponse);
-                    SubNr = 3;
-                    GetDataID();
-                }
                     catch (Exception ex)
 
-                {
+                    {
+                    }
                 }
-            }
-                
+
             }
             else
             {
@@ -433,12 +434,12 @@ namespace ProgramNummerCheck
 
         {
 
-                Console.WriteLine("Co wyszlo:" + IDName);
-                var client = new RestClient("http://localhost:1026/");
-                var request = new RestRequest("/v2/entities/" + IDName);
-                request.AddHeader("fiware-service", "opcua_car");
-                request.AddHeader("fiware-servicepath", "/demo");
-                var response = client.Execute(request);
+            Console.WriteLine("Co wyszlo:" + IDName);
+            var client = new RestClient("http://localhost:1026/");
+            var request = new RestRequest("/v2/entities/" + IDName);
+            request.AddHeader("fiware-service", "robot_info");
+            request.AddHeader("fiware-servicepath", "/demo");
+            var response = client.Execute(request);
             if (IDName != null)
             {
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
@@ -474,7 +475,7 @@ namespace ProgramNummerCheck
                 }
             }
 
-           
+
 
         }
 
@@ -484,29 +485,29 @@ namespace ProgramNummerCheck
 
         {
 
-                Console.WriteLine("Co wyszlo:" + OrderID);
-                var client = new RestClient("http://localhost:1026/");
-                var request = new RestRequest("/v2/entities/" + OrderID);
-                request.AddHeader("fiware-service", "opcua_car");
-                request.AddHeader("fiware-servicepath", "/demo");
-                var response = client.Execute(request);
-                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            Console.WriteLine("Co wyszlo:" + OrderID);
+            var client = new RestClient("http://localhost:1026/");
+            var request = new RestRequest("/v2/entities/" + OrderID);
+            request.AddHeader("fiware-service", "robot_info");
+            request.AddHeader("fiware-servicepath", "/demo");
+            var response = client.Execute(request);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                //    string Sub1 = System.IO.File.ReadAllText(@"C:\Users\marlena.knitter\Source\Repos\CSharpApp-\test.txt");
+
+                string rawResponse2 = response.Content;
+
+                //if (Sub1 != rawResponse)
+                //{
+                Console.WriteLine("poszlo");
+                Console.WriteLine(rawResponse2);
+                ProductName programName = new JavaScriptSerializer().Deserialize<ProductName>(rawResponse2);
+                try
                 {
-                    //    string Sub1 = System.IO.File.ReadAllText(@"C:\Users\marlena.knitter\Source\Repos\CSharpApp-\test.txt");
 
-                    string rawResponse2 = response.Content;
-
-                    //if (Sub1 != rawResponse)
-                    //{
-                    Console.WriteLine("poszlo");
-                    Console.WriteLine(rawResponse2);
-                    ProductName programName = new JavaScriptSerializer().Deserialize<ProductName>(rawResponse2);
-                    try
-                    {
-
-                        ProgrammName = programName.programName.value;
-                        planCycleTime = Convert.ToInt32(programName.planCycleTime.value);
-                        processingLength = Convert.ToInt32(programName.processingLength.value);
+                    ProgrammName = programName.programName.value;
+                    planCycleTime = Convert.ToInt32(programName.planCycleTime.value);
+                    processingLength = Convert.ToInt32(programName.processingLength.value);
 
 
                     Console.WriteLine("programName:{0}, PlanCycTime:{1}, procLenght:{2}", ProgrammName, planCycleTime, processingLength);
@@ -514,13 +515,13 @@ namespace ProgramNummerCheck
 
 
                 }
-                    catch (NullReferenceException ex)
-                    {
-                    }
-                }
-                else
+                catch (NullReferenceException ex)
                 {
-                    Console.Write("Sh*t happend");
+                }
+            }
+            else
+            {
+                Console.Write("Sh*t happend");
 
             }
 
@@ -617,7 +618,7 @@ namespace ProgramNummerCheck
         {
             public int value { get; set; }
         }
-#endregion
+        #endregion
 
         public static void Answer()
         {
@@ -627,17 +628,25 @@ namespace ProgramNummerCheck
             request.AddHeader("fiware-service", "robot_info");
             request.AddHeader("fiware-servicepath", "/demo");
             request.AddHeader("Content-Type", "application/json");
-            var body = @"{ ""value"": [""" + orderStatus + @""", """ + IDName + @""", """ + ProgrammName +  @""", """ + ProgrammName + @""", """ + orderStatus + @""", " + OrderID + @", " + VersionOnRobot  + @", " + planCycleTime + @", " + planParts +  "]," + "\n" +
+          
+
+            var body = @"{" + "\n" + @"""value"": [""" + orderStatus + @""", """ + IDName + @""", """ + ProgrammName + @""", """ + OrderID + @""",  " + VersionOnRobot + @", " + planCycleTime + @", " + planCycleTime + @", " + planParts + "]," + "\n" +
             @"   ""type"": ""command""" + "\n" + @"}";
+            string bod1 = Convert.ToString(body); 
 
             Console.WriteLine(body);
-            request.AddParameter("application/json", body, ParameterType.RequestBody);
+
+            request.AddJsonBody(bod1);
+
+            client.Execute(request);
+
 
         }
 
     }
-
 }
+
+
 
 
 
